@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>קוד מחשבון קיבוע זכויות</title>
+    <title>מחשבון קיבוע זכויות</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -14,233 +13,58 @@
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-        }
-        .file-section {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+            border-radius: 16px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 40px;
         }
-        h1, h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+        .btn-primary {
+            background-color: #4169E1;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 10px;
         }
-        pre {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
+        .btn-secondary {
+            background-color: #2C3E50;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 10px;
         }
-        .file-header {
+        .text-center {
+            text-align: center;
+        }
+        .buttons-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .file-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .language-badge {
-            background: #e9ecef;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            color: #495057;
-        }
-        .github-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #24292e;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.2s;
-        }
-        .github-link:hover {
-            background-color: #2c3e50;
-            color: white;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>מחשבון קיבוע זכויות - קוד מקור</h1>
+        <h1 class="text-center mb-4">מחשבון קיבוע זכויות</h1>
+        <p class="text-center">ברוכים הבאים למחשבון קיבוע זכויות. המחשבון מאפשר לחשב את הפטור המגיע לך על הפנסיה החודשית.</p>
         
-        <a href="https://github.com/hyaron3880/rights-calculation" class="github-link" target="_blank">
-            <i class="fab fa-github"></i>
-            צפה בפרויקט ב-GitHub
-        </a>
-        
-        <div class="file-section">
-            <div class="file-header">
-                <span class="file-name">app.py</span>
-                <span class="language-badge">Python</span>
-            </div>
-            <pre><code class="language-python">from flask import Flask, render_template, request, jsonify
-from datetime import datetime
-
-app = Flask(__name__)
-
-# Tax brackets for years 2018-2024
-TAX_BRACKETS = {
-    2024: [[84120, 0.1], [120720, 0.14], [193800, 0.2], [269280, 0.31], [560280, 0.35], [721560, 0.47], [float('inf'), 0.5]],
-    2023: [[81480, 0.1], [116760, 0.14], [187440, 0.2], [260520, 0.31], [542160, 0.35], [698280, 0.47], [float('inf'), 0.5]],
-    2022: [[77400, 0.1], [110880, 0.14], [178080, 0.2], [247440, 0.31], [514920, 0.35], [663240, 0.47], [float('inf'), 0.5]],
-    2021: [[75480, 0.1], [108360, 0.14], [173880, 0.2], [241680, 0.31], [502920, 0.35], [647640, 0.47], [float('inf'), 0.5]],
-    2020: [[75960, 0.1], [108960, 0.14], [174960, 0.2], [243120, 0.31], [505920, 0.35], [651600, 0.47], [float('inf'), 0.5]],
-    2019: [[75720, 0.1], [108600, 0.14], [174360, 0.2], [242400, 0.31], [504360, 0.35], [649560, 0.47], [float('inf'), 0.5]],
-    2018: [[74880, 0.1], [107400, 0.14], [172320, 0.2], [239520, 0.31], [498360, 0.35], [641880, 0.47], [float('inf'), 0.5]]
-}
-
-class RightsCalculator:
-    def __init__(self):
-        # 2024 Constants
-        self.QUALIFYING_PENSION_CEILING = 9430  # תקרת קצבה מזכה
-        self.BASIC_EXEMPTION_RATE = 0.35  # פטור בסיסי
-        self.ADDITIONAL_EXEMPTION_RATE = 0.17  # פטור נוסף
-        self.TOTAL_EXEMPTION_RATE = 0.52  # סה"כ פטור
-        self.SEVERANCE_IMPACT_FACTOR = 1.35  # מקדם השפעת פיצויים
-        self.MAX_SEVERANCE_IMPACT = 440000  # תקרת השפעת פיצויים
-        self.MONTHS_FACTOR = 180  # מקדם חודשי
-        self.CURRENT_YEAR = 2024  # שנת מס נוכחית
-        
-        # Tax credit point value for 2024
-        self.CREDIT_POINT_VALUE = 242  # ערך נקודת זיכוי
-        self.MALE_CREDIT_POINTS = 2.25  # נקודות זיכוי לגבר
-        self.FEMALE_CREDIT_POINTS = 2.75  # נקודות זיכוי לאישה
-        
-        # National Insurance Constants
-        self.NI_THRESHOLD = 7522  # סף ביטוח לאומי (60% מהשכר הממוצע)
-        self.NI_MAX = 49030  # תקרת ביטוח לאומי
-        
-        # Insurance rates for 60+
-        self.NI_LOW_RATE = 0.004  # שיעור ביטוח לאומי נמוך
-        self.NI_HIGH_RATE = 0.07  # שיעור ביטוח לאומי גבוה
-        self.HEALTH_LOW_RATE = 0.031  # שיעור ביטוח בריאות נמוך
-        self.HEALTH_HIGH_RATE = 0.05  # שיעור ביטוח בריאות גבוה</code></pre>
-        </div>
-
-        <div class="file-section">
-            <div class="file-header">
-                <span class="file-name">templates/index.html</span>
-                <span class="language-badge">HTML</span>
-            </div>
-            <pre><code class="language-html"><!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון קיבוע זכויות</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <style>
-        body {
-            background-color: #f5f5f5;
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-        }
-
-        .calculator-form {
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #2C3E50;
-        }
-
-        .print-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .print-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            background: #4169E1;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .print-button.secondary {
-            background: #2C3E50;
-        }
-
-        .print-button:hover {
-            opacity: 0.9;
-        }
-
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .container {
-                box-shadow: none;
-                max-width: 100%;
-                padding: 0;
-            }
-
-            .calculator-form,
-            .buttons-container,
-            .print-buttons,
-            button:not(.print-button) {
-                display: none !important;
-            }
-
-            .result-section {
-                display: block !important;
-            }
-
-            .card {
-                break-inside: avoid;
-                border: none;
-                box-shadow: none;
-                margin: 0;
-                padding: 10px 0;
-            }
-        }
-    </style>
-</head>
-</code></pre>
+        <div class="buttons-container">
+            <a href="calculator.html" class="btn btn-primary">
+                <i class="fas fa-calculator"></i>
+                התחל חישוב
+            </a>
+            <a href="source.html" class="btn btn-secondary">
+                <i class="fas fa-code"></i>
+                צפה בקוד המקור
+            </a>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>
 </html>
