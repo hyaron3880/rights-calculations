@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון קיבוע זכויות</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+
+        .calculator-form {
+            margin-bottom: 30px;
+        }
+
+        .dates-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .date-group {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2C3E50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4169E1;
+            box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.2);
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+
+        .form-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .buttons-container button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Cards Styling */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            border-top: 4px solid #4169E1;
+        }
+
+        .section-title {
+            color: #4169E1;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #4169E1;
+            margin-left: 8px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .label {
+            color: #2C3E50;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #2C3E50;
+            text-align: left;
+            direction: ltr;
+            min-width: 120px;
+        }
+
+        .total-value {
+            color: #4169E1;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        /* RTL specific adjustments */
+        .rtl-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .number-value {
+            direction: ltr;
+            display: inline-block;
+            text-align: left;
+            color: #2C3E50;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+
+        /* Copy button styles */
+        .copy-button-container {
+            display: flex;
+            justify-content: flex-start;
+            margin: 12px 0 5px 0;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .copy-button {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-button:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .copy-button i {
+            font-size: 14px;
+        }
+
+        /* Print buttons */
+        .print-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .print-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+
+        .print-button:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .print-button.secondary {
+            background-color: #e9ecef;
+        }
+
+        /* Animation durations */
+        .animate__fadeIn {
+            --animate-duration: 0.5s;
+        }
+
+        /* Success message animation */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .copy-success {
+            color: #28a745;
+            animation: fadeOut 1.5s ease-out forwards;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .dates-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .date-group {
+                width: 100%;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .result-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .value {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4 section-title">מחשבון קיבוע זכויות</h1>
+        
+        <form id="calculatorForm" class="calculator-form animate__animated animate__fadeIn">
+            <div class="dates-row">
+                <div class="date-group">
+                    <label for="birthDate" class="form-label">תאריך לידה</label>
+                    <input type="date" id="birthDate" class="form-control" required>
+                </div>
+                <div class="date-group">
+                    <label for="pensionStartDate" class="form-label">תאריך תחילת קבלת פנסיה</label>
+                    <input type="date" id="pensionStartDate" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">מגדר</label>
+                <div class="gender-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="male" value="male" checked>
+                        <label class="form-check-label" for="male">זכר</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+                        <label class="form-check-label" for="female">נקבה</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="severanceAmount" class="form-label">מענקי פרישה ופיצויים פטורים</label>
+                <input type="number" id="severanceAmount" class="form-control" required min="0" step="1000">
+                <small class="form-text">סכום מענקי הפרישה והפיצויים הפטורים שקיבלת</small>
+            </div>
+
+            <div class="form-group">
+                <label for="exemptCapital" class="form-label">סכום ההיוון הפטור</label>
+                <input type="number" id="exemptCapital" class="form-control" required min="0" step="1000">
+                <small class="form-text">סכום ההיוון הפטור שקיבלת או שאתה מתכנן לקבל</small>
+            </div>
+
+            <div class="form-group">
+                <label for="monthlyPension" class="form-label">גובה פנסיה חודשית</label>
+                <input type="number" id="monthlyPension" class="form-control" min="0" step="100">
+                <small class="form-text">גובה הפנסיה החודשית שלך</small>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalIncome" class="form-label">הכנסה חודשית נוספת</label>
+                <input type="number" id="additionalIncome" class="form-control" min="0" step="100">
+                <small class="form-text">הכנסה חודשית נוספת (אם יש)</small>
+            </div>
+
+            <div class="buttons-container">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-calculator"></i>
+                    חשב
+                </button>
+                <button type="button" id="resetForm" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i>
+                    נקה טופס
+                </button>
+                <button type="button" id="sampleCalculation" class="btn btn-outline-primary">
+                    <i class="fas fa-magic"></i>
+                    הדגמה
+                </button>
+            </div>
+        </form>
+
+        <div id="results" class="result-section animate__animated animate__fadeIn" style="display: none;">
+            <div id="basicCalculationSection" class="card rtl-content">
+                <h3 class="section-title">
+                    <i class="fas fa-calculator"></i>
+                    נתוני חישוב בסיסיים
+                </h3>
+                <div class="result-row">
+                    <span class="label">סך הון פטור:</span>
+                    <span class="value number-value" id="totalExemptCapital"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">השפעת פיצויים:</span>
+                    <span class="value number-value" id="severanceImpact"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">יתרת הון פטורה:</span>
+                    <span class="value number-value" id="remainingExemptCapital"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">הון פטור סופי:</span>
+                    <span class="value number-value" id="finalExemptCapital"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">פטור חודשי:</span>
+                    <span class="value number-value" id="monthlyExemption"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">אחוז פטור:</span>
+                    <span class="value number-value" id="exemptionPercentage"></span>
+                </div>
+                <div class="copy-button-container">
+                    <button onclick="copyCardContent(this.closest('.card'))" class="copy-button">
+                        <i class="fas fa-copy"></i>
+                        העתק נתונים
+                    </button>
+                </div>
+            </div>
+
+            <div id="taxableIncomeSection" class="card rtl-content">
+                <h3 class="section-title">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    חישוב הכנסה חייבת במס
+                </h3>
+                <div class="result-row">
+                    <span class="label">הכנסה חייבת מפנסיה:</span>
+                    <span class="value number-value" id="taxableIncome"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">סך הכנסה חודשית:</span>
+                    <span class="value number-value" id="totalMonthlyIncome"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">שיעור מס שולי:</span>
+                    <span class="value number-value" id="marginalTaxRate"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">מס:</span>
+                    <span class="value number-value" id="taxAmount"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">ביטוח לאומי:</span>
+                    <span class="value number-value" id="nationalInsurance"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">ביטוח בריאות:</span>
+                    <span class="value number-value" id="healthInsurance"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">סך הפחתות:</span>
+                    <span class="value number-value" id="totalDeductions"></span>
+                </div>
+                <div class="result-row">
+                    <span class="label">סך הכנסה נטו:</span>
+                    <span class="value number-value total-value" id="netIncome"></span>
+                </div>
+                <div class="copy-button-container">
+                    <button onclick="copyCardContent(this.closest('.card'))" class="copy-button">
+                        <i class="fas fa-copy"></i>
+                        העתק נתונים
+                    </button>
+                </div>
+            </div>
+
+            <div class="print-buttons">
+                <button onclick="printDocument()" class="print-button">
+                    <i class="fas fa-print"></i>
+                    הדפסה למדפסת
+                </button>
+                <button onclick="exportToPDF()" class="print-button secondary">
+                    <i class="fas fa-file-pdf"></i>
+                    שמירה כ-PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="error" class="error-message"></div>
+    </div>
+
+    <script>
+        // Constants
+        const TAX_BRACKETS = {
+            2024: [[84120, 0.1], [120720, 0.14], [193800, 0.2], [269280, 0.31], [560280, 0.35], [721560, 0.47], [Infinity, 0.5]]
+            // ... other years
+        };
+
+        class RightsCalculator {
+            constructor() {
+                // 2024 Constants
+                this.QUALIFYING_PENSION_CEILING = 9430;
+                this.BASIC_EXEMPTION_RATE = 0.35;
+                this.ADDITIONAL_EXEMPTION_RATE = 0.17;
+                this.TOTAL_EXEMPTION_RATE = 0.52;
+                this.SEVERANCE_IMPACT_FACTOR = 1.35;
+                this.MAX_SEVERANCE_IMPACT = 440000;
+                this.MONTHS_FACTOR = 180;
+                this.CURRENT_YEAR = 2024;
+                
+                this.CREDIT_POINT_VALUE = 242;
+                this.MALE_CREDIT_POINTS = 2.25;
+                this.FEMALE_CREDIT_POINTS = 2.75;
+                
+                this.NI_THRESHOLD = 7522;
+                this.NI_MAX = 49030;
+                
+                this.NI_LOW_RATE = 0.004;
+                this.NI_HIGH_RATE = 0.07;
+                this.HEALTH_LOW_RATE = 0.031;
+                this.HEALTH_HIGH_RATE = 0.05;
+            }
+
+            calculateInsurance(monthlyIncome) {
+                const income = Math.min(monthlyIncome, this.NI_MAX);
+                const lowerBracket = Math.min(income, this.NI_THRESHOLD);
+                
+                const niLow = lowerBracket * this.NI_LOW_RATE;
+                const healthLow = lowerBracket * this.HEALTH_LOW_RATE;
+                
+                let niHigh = 0;
+                let healthHigh = 0;
+                
+                if (income > this.NI_THRESHOLD) {
+                    const higherAmount = income - this.NI_THRESHOLD;
+                    niHigh = higherAmount * this.NI_HIGH_RATE;
+                    healthHigh = higherAmount * this.HEALTH_HIGH_RATE;
+                }
+                
+                return {
+                    nationalInsurance: niLow + niHigh,
+                    healthInsurance: healthLow + healthHigh
+                };
+            }
+
+            calculateTaxBracket(annualIncome) {
+                const brackets = TAX_BRACKETS[this.CURRENT_YEAR];
+                
+                for (const [limit, rate] of brackets) {
+                    if (annualIncome <= limit) {
+                        return rate * 100;
+                    }
+                }
+                
+                return brackets[brackets.length - 1][1] * 100;
+            }
+
+            calculateNetIncome(monthlyIncome, gender) {
+                const annualIncome = monthlyIncome * 12;
+                let totalTax = 0;
+                let remainingIncome = annualIncome;
+                let prevLimit = 0;
+
+                for (const [limit, rate] of TAX_BRACKETS[this.CURRENT_YEAR]) {
+                    if (remainingIncome <= 0) break;
+                    
+                    const taxableInBracket = Math.min(remainingIncome, limit - prevLimit);
+                    const taxInBracket = taxableInBracket * rate;
+                    totalTax += taxInBracket;
+                    
+                    remainingIncome -= taxableInBracket;
+                    prevLimit = limit;
+                }
+
+                const creditPoints = gender === 'male' ? this.MALE_CREDIT_POINTS : this.FEMALE_CREDIT_POINTS;
+                const annualCredit = creditPoints * this.CREDIT_POINT_VALUE * 12;
+                totalTax = Math.max(0, totalTax - annualCredit);
+                const monthlyTax = totalTax / 12;
+
+                const insurance = this.calculateInsurance(monthlyIncome);
+                const totalDeductions = monthlyTax + insurance.nationalInsurance + insurance.healthInsurance;
+                
+                return {
+                    grossIncome: monthlyIncome,
+                    tax: monthlyTax,
+                    nationalInsurance: insurance.nationalInsurance,
+                    healthInsurance: insurance.healthInsurance,
+                    totalDeductions: totalDeductions,
+                    netIncome: monthlyIncome - totalDeductions
+                };
+            }
+
+            calculateExemption(birthDate, gender, pensionStartDate, exemptSeverance, capitalizationAmount, monthlyPension = null, additionalIncome = 0) {
+                try {
+                    // Convert dates
+                    const birthDateObj = new Date(birthDate);
+                    const pensionStartDateObj = new Date(pensionStartDate);
+                    const currentDate = new Date();
+
+                    // Calculate age
+                    const age = currentDate.getFullYear() - birthDateObj.getFullYear() -
+                        ((currentDate.getMonth() < birthDateObj.getMonth()) ||
+                        (currentDate.getMonth() === birthDateObj.getMonth() && currentDate.getDate() < birthDateObj.getDate()));
+
+                    // Check eligibility age
+                    const retirementAge = gender.toLowerCase() === 'male' ? 67 : 62;
+                    const pensionStartAge = pensionStartDateObj.getFullYear() - birthDateObj.getFullYear() -
+                        ((pensionStartDateObj.getMonth() < birthDateObj.getMonth()) ||
+                        (pensionStartDateObj.getMonth() === birthDateObj.getMonth() && pensionStartDateObj.getDate() < birthDateObj.getDate()));
+                    const eligibilityAge = Math.max(retirementAge, pensionStartAge);
+
+                    if (age < eligibilityAge) {
+                        return {
+                            error: `טרם הגעת לגיל הזכאות. גיל הזכאות במקרה שלך הוא ${eligibilityAge}`
+                        };
+                    }
+
+                    // Calculate exemptions
+                    const totalExemptCapital = this.QUALIFYING_PENSION_CEILING * this.TOTAL_EXEMPTION_RATE * this.MONTHS_FACTOR;
+                    const severanceImpact = Math.min(
+                        exemptSeverance * this.SEVERANCE_IMPACT_FACTOR,
+                        this.MAX_SEVERANCE_IMPACT
+                    );
+                    const remainingExemptCapital = totalExemptCapital - severanceImpact;
+
+                    if (capitalizationAmount > remainingExemptCapital) {
+                        return {
+                            error: "סכום ההיוון המבוקש גבוה מיתרת ההון הפטורה"
+                        };
+                    }
+
+                    const finalExemptCapital = remainingExemptCapital - capitalizationAmount;
+                    const monthlyExemption = finalExemptCapital / this.MONTHS_FACTOR;
+                    const exemptionPercentage = (monthlyExemption / this.QUALIFYING_PENSION_CEILING) * 100;
+
+                    let taxableIncome = null;
+                    let totalMonthlyIncome = null;
+                    let marginalTaxRate = null;
+                    let netIncome = null;
+                    let taxAmount = null;
+                    let nationalInsurance = null;
+                    let healthInsurance = null;
+                    let totalDeductions = null;
+
+                    if (monthlyPension !== null) {
+                        // Calculate taxable pension income
+                        taxableIncome = Math.max(0, monthlyPension - monthlyExemption);
+                        
+                        // Calculate tax only on additional income
+                        const additionalIncomeNet = additionalIncome ? this.calculateNetIncome(additionalIncome, gender) : null;
+                        
+                        if (additionalIncomeNet) {
+                            // Use only additional income for tax calculation
+                            marginalTaxRate = this.calculateTaxBracket(additionalIncome * 12);
+                            
+                            // Calculate insurance on additional income only
+                            const insurance = this.calculateInsurance(additionalIncome);
+                            nationalInsurance = insurance.nationalInsurance;
+                            healthInsurance = insurance.healthInsurance;
+                            
+                            // Total monthly income is taxable pension plus additional income
+                            totalMonthlyIncome = taxableIncome;
+                            
+                            // Net income is additional income minus deductions
+                            netIncome = additionalIncomeNet.netIncome;
+                            taxAmount = additionalIncomeNet.tax;
+                            totalDeductions = additionalIncomeNet.totalDeductions;
+                        }
+                    }
+
+                    return {
+                        calculations: {
+                            totalExemptCapital,
+                            severanceImpact,
+                            remainingExemptCapital,
+                            finalExemptCapital,
+                            monthlyExemption,
+                            exemptionPercentage,
+                            taxableIncome,
+                            totalMonthlyIncome,
+                            marginalTaxRate,
+                            netIncome,
+                            taxAmount,
+                            nationalInsurance,
+                            healthInsurance,
+                            totalDeductions
+                        }
+                    };
+                } catch (error) {
+                    return { error: error.message };
+                }
+            }
+        }
+
+        // Initialize calculator
+        const calculator = new RightsCalculator();
+
+        // Form submission handler
+        document.getElementById('calculatorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                birthDate: document.getElementById('birthDate').value,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                pensionStartDate: document.getElementById('pensionStartDate').value,
+                exemptSeverance: parseFloat(document.getElementById('severanceAmount').value),
+                capitalizationAmount: parseFloat(document.getElementById('exemptCapital').value),
+                monthlyPension: document.getElementById('monthlyPension').value ? parseFloat(document.getElementById('monthlyPension').value) : null,
+                additionalIncome: document.getElementById('additionalIncome').value ? parseFloat(document.getElementById('additionalIncome').value) : 0
+            };
+
+            const result = calculator.calculateExemption(
+                formData.birthDate,
+                formData.gender,
+                formData.pensionStartDate,
+                formData.exemptSeverance,
+                formData.capitalizationAmount,
+                formData.monthlyPension,
+                formData.additionalIncome
+            );
+
+            // Update UI with results
+            if (result.error) {
+                document.getElementById('error').textContent = result.error;
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+            } else {
+                updateResults(result.calculations);
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+            }
+        });
+
+        // Example button functionality
+        document.getElementById('sampleCalculation').addEventListener('click', () => {
+            // Set sample values
+            document.getElementById('birthDate').value = '1956-01-01';
+            document.getElementById('pensionStartDate').value = '2020-01-01';
+            document.querySelector('input[name="gender"][value="male"]').checked = true;
+            document.getElementById('severanceAmount').value = '113000';
+            document.getElementById('exemptCapital').value = '42000';
+            document.getElementById('monthlyPension').value = '7000';
+            document.getElementById('additionalIncome').value = '4000';
+            
+            // Trigger form submission
+            document.getElementById('calculatorForm').dispatchEvent(new Event('submit'));
+        });
+
+        // Reset form functionality
+        document.getElementById('resetForm').addEventListener('click', () => {
+            document.getElementById('calculatorForm').reset();
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').textContent = '';
+            document.getElementById('error').style.display = 'none';
+        });
+
+        // Helper function to update results in the UI
+        function updateResults(calculations) {
+            const updateValue = (elementId, value) => {
+                const element = document.getElementById(elementId);
+                if (element && value !== null && value !== undefined) {
+                    if (typeof value === 'number') {
+                        element.textContent = value.toLocaleString('he-IL', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }) + ' ₪';
+                    } else {
+                        element.textContent = value + (value.includes('%') ? '' : ' ₪');
+                    }
+                }
+            };
+
+            // Update basic calculation section
+            updateValue('totalExemptCapital', calculations.totalExemptCapital);
+            updateValue('severanceImpact', calculations.severanceImpact);
+            updateValue('remainingExemptCapital', calculations.remainingExemptCapital);
+            updateValue('finalExemptCapital', calculations.finalExemptCapital);
+            updateValue('monthlyExemption', calculations.monthlyExemption);
+            updateValue('exemptionPercentage', Math.round(calculations.exemptionPercentage) + '%');
+
+            const taxableIncomeSection = document.getElementById('taxableIncomeSection');
+            if (calculations.taxableIncome !== null) {
+                updateValue('taxableIncome', calculations.taxableIncome);
+                updateValue('totalMonthlyIncome', calculations.totalMonthlyIncome);
+                updateValue('marginalTaxRate', Math.round(calculations.marginalTaxRate) + '%');
+                updateValue('taxAmount', calculations.taxAmount);
+                updateValue('nationalInsurance', calculations.nationalInsurance);
+                updateValue('healthInsurance', calculations.healthInsurance);
+                updateValue('totalDeductions', calculations.totalDeductions);
+                updateValue('netIncome', calculations.netIncome);
+                taxableIncomeSection.style.display = 'block';
+            } else {
+                taxableIncomeSection.style.display = 'none';
+            }
+        }
+
+        // Copy functionality
+        function copyCardContent(card) {
+            const rows = card.querySelectorAll('.result-row');
+            let content = '';
+            
+            const title = card.querySelector('.section-title').textContent.trim();
+            content += title + '\n\n';
+            
+            rows.forEach(row => {
+                const label = row.querySelector('.label').textContent;
+                const value = row.querySelector('.value').textContent;
+                content += `${label} ${value}\n`;
+            });
+
+            navigator.clipboard.writeText(content).then(() => {
+                const button = card.querySelector('.copy-button');
+                const originalContent = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check copy-success"></i>הועתק';
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                }, 1500);
+            });
+        }
+
+        // Print functionality
+        function printDocument() {
+            showInputSummary();
+            window.print();
+        }
+
+        function exportToPDF() {
+            showInputSummary();
+            const style = document.createElement('style');
+            style.textContent = `
+                @media print {
+                    @page {
+                        size: A4;
+                        margin: 1.5cm;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            window.print();
+            document.head.removeChild(style);
+        }
+
+        function showInputSummary() {
+            const inputSummary = document.createElement('div');
+            inputSummary.className = 'input-summary card rtl-content show-for-print';
+            
+            const title = document.createElement('h3');
+            title.className = 'section-title';
+            title.innerHTML = '<i class="fas fa-keyboard"></i> נתונים שהוזנו';
+            inputSummary.appendChild(title);
+
+            const inputs = [
+                { label: 'תאריך לידה', value: document.getElementById('birthDate').value },
+                { label: 'תאריך תחילת קבלת פנסיה', value: document.getElementById('pensionStartDate').value },
+                { label: 'מגדר', value: document.querySelector('input[name="gender"]:checked').value === 'male' ? 'זכר' : 'נקבה' },
+                { label: 'מענקי פרישה ופיצויים', value: document.getElementById('severanceAmount').value + ' ₪' },
+                { label: 'סכום ההיוון הפטור', value: document.getElementById('exemptCapital').value + ' ₪' },
+                { label: 'גובה פנסיה חודשית', value: document.getElementById('monthlyPension').value + ' ₪' },
+                { label: 'הכנסה חודשית נוספת', value: (document.getElementById('additionalIncome').value || '0') + ' ₪' }
+            ];
+
+            inputs.forEach(input => {
+                const row = document.createElement('div');
+                row.className = 'result-row';
+                row.innerHTML = `
+                    <span class="label">${input.label}:</span>
+                    <span class="value">${input.value}</span>
+                `;
+                inputSummary.appendChild(row);
+            });
+
+            const oldSummary = document.querySelector('.input-summary');
+            if (oldSummary) {
+                oldSummary.remove();
+            }
+
+            const resultsSection = document.getElementById('results');
+            resultsSection.insertBefore(inputSummary, resultsSection.firstChild);
+        }
+    </script>
+</body>
+</html>
