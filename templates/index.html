@@ -326,6 +326,54 @@
                 margin-bottom: 10px;
             }
         }
+
+        /* Custom animation duration */
+        .animate__fadeIn {
+            --animate-duration: 0.5s;
+        }
+
+        /* Copy button styles */
+        .copy-button-container {
+            display: flex;
+            justify-content: flex-start;  
+            margin: 12px 0 5px 0;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .copy-button {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-button:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .copy-button i {
+            font-size: 14px;
+        }
+
+        /* Success message animation */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .copy-success {
+            color: #28a745;
+            animation: fadeOut 1.5s ease-out forwards;
+        }
     </style>
 </head>
 <body>
@@ -336,12 +384,12 @@
             <div class="dates-row">
                 <div class="date-group">
                     <label class="form-label">תאריך לידה</label>
-                    <input type="date" class="form-control" id="birthDate" required>
+                    <input type="date" class="form-control" id="birth_date" required>
                 </div>
 
                 <div class="date-group">
                     <label class="form-label">תאריך תחילת קבלת פנסיה</label>
-                    <input type="date" class="form-control" id="pensionStartDate" required>
+                    <input type="date" class="form-control" id="pension_start_date" required>
                 </div>
             </div>
 
@@ -356,24 +404,45 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">מענקי פרישה ופיצויים שקיבלתם בפטור ממס</label>
-                <input type="number" class="form-control" id="severanceAmount" required>
+                <label for="monthly_pension" class="form-label">קצבה חודשית</label>
+                <input type="number" class="form-control" id="monthly_pension" name="monthly_pension" step="0.01">
+                <small class="form-text">הכנס את סכום הקצבה החודשית</small>
+            </div>
+
+            <div class="form-group">
+                <label for="additional_income" class="form-label">הכנסה נוספת</label>
+                <input type="number" class="form-control" id="additional_income" name="additional_income" step="0.01">
+                <small class="form-text">הכנס סכום הכנסה נוספת אם קיימת</small>
+            </div>
+
+            <div class="form-group">
+                <label for="exempt_severance" class="form-label">מענקי פרישה ופיצויים שקיבלתם בפטור ממס</label>
+                <input type="number" class="form-control" id="exempt_severance" required>
                 <small class="form-text">סכום הפיצויים הפטורים שנותרו ל-32 השנים שקדמו לגיל הזכאות</small>
             </div>
 
             <div class="form-group">
-                <label class="form-label">סכום ההיוון הפטור ממס המבוקש</label>
-                <input type="number" class="form-control" id="exemptCapital" required>
+                <label for="capitalization_amount" class="form-label">סכום היוון פטור שנמשך בעבר</label>
+                <input type="number" class="form-control" id="capitalization_amount" required>
+            </div>
+
+            <!-- שדות קלט חדשים -->
+            <div class="form-group">
+                <label for="waiver_amount" class="form-label">ויתור על פטור קצבה</label>
+                <input type="number" class="form-control" id="waiver_amount" name="waiver_amount" step="0.01">
+                <div class="d-flex justify-content-between">
+                    <small class="form-text">הכנס את סכום הפטור עליו תרצה לוותר</small>
+                    <small class="form-text text-primary" id="waiver_result"></small>
+                </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">גובה פנסיה חודשית (לא חובה)</label>
-                <input type="number" class="form-control" id="monthlyPension">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">הכנסה חודשית נוספת מיגיעה אישית (לא חובה)</label>
-                <input type="number" class="form-control" id="additionalIncome">
+                <label for="capital_amount" class="form-label">משיכת סכום הוני</label>
+                <input type="number" class="form-control" id="capital_amount" name="capital_amount" step="0.01">
+                <div class="d-flex justify-content-between">
+                    <small class="form-text">הכנס את הסכום ההוני שברצונך למשוך</small>
+                    <small class="form-text text-primary" id="capital_result"></small>
+                </div>
             </div>
 
             <div class="buttons-container">
@@ -383,92 +452,116 @@
             </div>
         </form>
 
-        <div id="results" class="result-section" style="display: none;">
-            <div id="basicCalculationSection" class="card rtl-content">
+        <div id="results" class="result-section animate__animated animate__fadeIn" style="display: none;">
+            <!-- טבלת תוצאות -->
+            <div class="card rtl-content mb-4">
                 <h3 class="section-title">
-                    <i class="fas fa-calculator"></i>
-                    נתוני חישוב בסיסיים
+                    <i class="fas fa-table"></i>
+                    טבלת תוצאות לפי שנים
                 </h3>
-                <div class="result-row">
-                    <span class="label">סה"כ הון פטור:</span>
-                    <span class="value number-value" id="totalExemptCapital"></span>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>סעיף</th>
+                                <th>עד שנת 2024</th>
+                                <th>2025</th>
+                                <th>2026</th>
+                                <th>2027</th>
+                                <th>2028 ואילך</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>פטור מירבי על קצבה (פטור חודשי)</td>
+                                <td><span id="max_monthly_exemption_2024" class="number-value">0</span></td>
+                                <td><span id="max_monthly_exemption_2025" class="number-value">0</span></td>
+                                <td><span id="max_monthly_exemption_2026" class="number-value">0</span></td>
+                                <td><span id="max_monthly_exemption_2027" class="number-value">0</span></td>
+                                <td><span id="max_monthly_exemption_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>הפרש (תוספת לפטור בשקלים)</td>
+                                <td><span id="exemption_addition_2024" class="number-value">0</span></td>
+                                <td><span id="exemption_addition_2025" class="number-value">0</span></td>
+                                <td><span id="exemption_addition_2026" class="number-value">0</span></td>
+                                <td><span id="exemption_addition_2027" class="number-value">0</span></td>
+                                <td><span id="exemption_addition_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>שיעור הפטור</td>
+                                <td><span id="exemption_rate_2024" class="number-value">0</span>%</td>
+                                <td><span id="exemption_rate_2025" class="number-value">0</span>%</td>
+                                <td><span id="exemption_rate_2026" class="number-value">0</span>%</td>
+                                <td><span id="exemption_rate_2027" class="number-value">0</span>%</td>
+                                <td><span id="exemption_rate_2028" class="number-value">0</span>%</td>
+                            </tr>
+                            <tr>
+                                <td>הכנסה חודשית חייבת במס</td>
+                                <td><span id="taxable_monthly_income_2024" class="number-value">0</span></td>
+                                <td><span id="taxable_monthly_income_2025" class="number-value">0</span></td>
+                                <td><span id="taxable_monthly_income_2026" class="number-value">0</span></td>
+                                <td><span id="taxable_monthly_income_2027" class="number-value">0</span></td>
+                                <td><span id="taxable_monthly_income_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>שיעור המס השולי</td>
+                                <td><span id="marginal_tax_rate_2024" class="number-value">0</span>%</td>
+                                <td><span id="marginal_tax_rate_2025" class="number-value">0</span>%</td>
+                                <td><span id="marginal_tax_rate_2026" class="number-value">0</span>%</td>
+                                <td><span id="marginal_tax_rate_2027" class="number-value">0</span>%</td>
+                                <td><span id="marginal_tax_rate_2028" class="number-value">0</span>%</td>
+                            </tr>
+                            <tr>
+                                <td>סך מס חודשי לתשלום</td>
+                                <td><span id="monthly_tax_2024" class="number-value">0</span></td>
+                                <td><span id="monthly_tax_2025" class="number-value">0</span></td>
+                                <td><span id="monthly_tax_2026" class="number-value">0</span></td>
+                                <td><span id="monthly_tax_2027" class="number-value">0</span></td>
+                                <td><span id="monthly_tax_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>סך הכנסה חודשית נטו</td>
+                                <td><span id="monthly_net_income_2024" class="number-value">0</span></td>
+                                <td><span id="monthly_net_income_2025" class="number-value">0</span></td>
+                                <td><span id="monthly_net_income_2026" class="number-value">0</span></td>
+                                <td><span id="monthly_net_income_2027" class="number-value">0</span></td>
+                                <td><span id="monthly_net_income_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>סך הפטור לויתור ועדיין לא לשלם מס</td>
+                                <td><span id="waiver_for_no_tax_2024" class="number-value">0</span></td>
+                                <td><span id="waiver_for_no_tax_2025" class="number-value">0</span></td>
+                                <td><span id="waiver_for_no_tax_2026" class="number-value">0</span></td>
+                                <td><span id="waiver_for_no_tax_2027" class="number-value">0</span></td>
+                                <td><span id="waiver_for_no_tax_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>סכום הוני פטור מקסימלי שנותר להוון</td>
+                                <td><span id="remaining_exempt_capital_2024" class="number-value">0</span></td>
+                                <td><span id="remaining_exempt_capital_2025" class="number-value">0</span></td>
+                                <td><span id="remaining_exempt_capital_2026" class="number-value">0</span></td>
+                                <td><span id="remaining_exempt_capital_2027" class="number-value">0</span></td>
+                                <td><span id="remaining_exempt_capital_2028" class="number-value">0</span></td>
+                            </tr>
+                            <tr>
+                                <td>הפרש (תוספת להון)</td>
+                                <td><span id="capital_addition_2024" class="number-value">0</span></td>
+                                <td><span id="capital_addition_2025" class="number-value">0</span></td>
+                                <td><span id="capital_addition_2026" class="number-value">0</span></td>
+                                <td><span id="capital_addition_2027" class="number-value">0</span></td>
+                                <td><span id="capital_addition_2028" class="number-value">0</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="result-row">
-                    <span class="label">השפעת משיכת פיצויים:</span>
-                    <span class="value number-value" id="severanceImpact"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">יתרת הון פטורה:</span>
-                    <span class="value number-value" id="remainingExemptCapital"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">הון פטור סופי:</span>
-                    <span class="value number-value" id="finalExemptCapital"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">פטור חודשי:</span>
-                    <span class="value number-value" id="monthlyExemption"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">אחוז פטור:</span>
-                    <span class="value number-value" id="exemptionPercentage"></span>
-                </div>
-            </div>
-
-            <div id="taxableIncomeSection" class="card rtl-content">
-                <h3 class="section-title">
-                    <i class="fas fa-coins"></i>
-                    חישוב הכנסה והמס
-                </h3>
-                <div class="result-row">
-                    <span class="label">הכנסה חייבת במס:</span>
-                    <span class="value number-value" id="taxableIncome"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">סה"כ הכנסה חודשית:</span>
-                    <span class="value number-value" id="totalMonthlyIncome"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">שיעור המס השולי:</span>
-                    <span class="value number-value" id="marginalTaxRate"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">מס הכנסה:</span>
-                    <span class="value number-value" id="taxAmount"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">ביטוח לאומי:</span>
-                    <span class="value number-value" id="nationalInsurance"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">ביטוח בריאות:</span>
-                    <span class="value number-value" id="healthInsurance"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">סה"כ ניכויים:</span>
-                    <span class="value number-value" id="totalDeductions"></span>
-                </div>
-                <div class="result-row">
-                    <span class="label">סך הכנסה נטו:</span>
-                    <span class="value number-value total-value" id="netIncome"></span>
-                </div>
-            </div>
-
-            <div class="print-buttons">
-                <button onclick="printDocument()" class="print-button">
-                    <i class="fas fa-print"></i>
-                    הדפסה למדפסת
-                </button>
-                <button onclick="exportToPDF()" class="print-button secondary">
-                    <i class="fas fa-file-pdf"></i>
-                    שמירה כ-PDF
-                </button>
             </div>
         </div>
 
         <div id="error" class="error-message"></div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             // Reset form functionality
             document.getElementById('resetForm').addEventListener('click', () => {
@@ -479,13 +572,13 @@
 
             document.getElementById('sampleCalculation').addEventListener('click', () => {
                 // Set sample values
-                document.getElementById('birthDate').value = '1956-01-01';
-                document.getElementById('pensionStartDate').value = '2020-01-01';
+                document.getElementById('birth_date').value = '1956-01-01';
+                document.getElementById('pension_start_date').value = '2020-01-01';
                 document.querySelector('input[name="gender"][value="male"]').checked = true;
-                document.getElementById('severanceAmount').value = '113000';
-                document.getElementById('exemptCapital').value = '42000';
-                document.getElementById('monthlyPension').value = '7000';
-                document.getElementById('additionalIncome').value = '4000';
+                document.getElementById('exempt_severance').value = '113000';
+                document.getElementById('capitalization_amount').value = '42000';
+                document.getElementById('monthly_pension').value = '7000';
+                document.getElementById('additional_income').value = '4000';
                 
                 // Trigger form submission
                 document.getElementById('calculatorForm').dispatchEvent(new Event('submit'));
@@ -500,13 +593,15 @@
                 submitButton.disabled = true;
                 
                 const formData = {
-                    birth_date: document.getElementById('birthDate').value,
+                    birth_date: document.getElementById('birth_date').value,
                     gender: document.querySelector('input[name="gender"]:checked').value,
-                    pension_start_date: document.getElementById('pensionStartDate').value,
-                    exempt_severance: parseFloat(document.getElementById('severanceAmount').value),
-                    capitalization_amount: parseFloat(document.getElementById('exemptCapital').value),
-                    monthly_pension: document.getElementById('monthlyPension').value ? parseFloat(document.getElementById('monthlyPension').value) : null,
-                    additional_income: document.getElementById('additionalIncome').value ? parseFloat(document.getElementById('additionalIncome').value) : 0
+                    pension_start_date: document.getElementById('pension_start_date').value,
+                    exempt_severance: document.getElementById('exempt_severance').value || '0',
+                    capitalization_amount: document.getElementById('capitalization_amount').value || '0',
+                    monthly_pension: document.getElementById('monthly_pension').value || '0',
+                    additional_income: document.getElementById('additional_income').value || '0',
+                    waiver_amount: document.getElementById('waiver_amount').value || '0',
+                    capital_amount: document.getElementById('capital_amount').value || '0'
                 };
 
                 try {
@@ -518,82 +613,43 @@
                         body: JSON.stringify(formData)
                     });
 
-                    const data = await response.json();
+                    const result = await response.json();
 
-                    if (data.error) {
-                        document.getElementById('error').textContent = data.error;
+                    if (result.error) {
+                        document.getElementById('error').textContent = result.error;
                         document.getElementById('error').style.display = 'block';
                         document.getElementById('results').style.display = 'none';
                         return;
                     }
 
-                    const results = document.getElementById('results');
-                    results.style.display = 'block';
-                    setTimeout(() => results.classList.add('show'), 50);
-
-                    const updateWithAnimation = (elementId, value) => {
-                        const element = document.getElementById(elementId);
-                        if (element) {
-                            // Check if value is a number and not NaN before displaying
-                            if (typeof value === 'number' && !isNaN(value)) {
-                                element.classList.add('animate__animated', 'animate__fadeIn');
-                                element.textContent = value.toLocaleString('he-IL', {
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 2
-                                }) + ' ₪';
-                                element.style.display = 'inline-block';
-                            } else if (typeof value === 'string') {
-                                element.classList.add('animate__animated', 'animate__fadeIn');
-                                if (value.includes('%')) {
-                                    element.textContent = value;
-                                } else {
-                                    element.textContent = value + (value.includes('₪') ? '' : ' ₪');
-                                }
-                                element.style.display = 'inline-block';
-                            } else {
-                                element.style.display = 'none';
-                                const parentRow = element.closest('.result-row');
-                                if (parentRow) {
-                                    parentRow.style.display = 'none';
-                                }
-                            }
+                    // בדיקה האם יש ערך שלילי בסכום ההוני המקסימלי
+                    let hasNegativeAmount = false;
+                    let maxPositiveAmount = 0;
+                    
+                    // עובר על כל השנים בטבלה
+                    for (const year in result.calculations) {
+                        const remainingExemptCapital = parseFloat(result.calculations[year].remaining_exempt_capital);
+                        if (remainingExemptCapital < 0) {
+                            hasNegativeAmount = true;
+                        } else if (remainingExemptCapital > maxPositiveAmount) {
+                            maxPositiveAmount = remainingExemptCapital;
                         }
-                    };
-
-                    updateWithAnimation('totalExemptCapital', data.calculations.total_exempt_capital);
-                    updateWithAnimation('severanceImpact', data.calculations.severance_impact);
-                    updateWithAnimation('remainingExemptCapital', data.calculations.remaining_exempt_capital);
-                    updateWithAnimation('finalExemptCapital', data.calculations.final_exempt_capital);
-                    updateWithAnimation('monthlyExemption', data.calculations.monthly_exemption);
-                    updateWithAnimation('exemptionPercentage', Math.round(data.calculations.exemption_percentage) + '%');
-
-                    const taxableIncomeSection = document.getElementById('taxableIncomeSection');
-                    if (data.calculations.taxable_income !== null) {
-                        updateWithAnimation('taxableIncome', data.calculations.taxable_income);
-                        updateWithAnimation('totalMonthlyIncome', data.calculations.total_monthly_income);
-                        updateWithAnimation('marginalTaxRate', Math.round(data.calculations.marginal_tax_rate) + '%');
-                        updateWithAnimation('netIncome', Math.round(data.calculations.net_income));
-                        
-                        // Only show these if they exist and are not NaN
-                        if (data.calculations.tax_amount) {
-                            updateWithAnimation('taxAmount', Math.round(data.calculations.tax_amount));
-                        }
-                        if (data.calculations.national_insurance) {
-                            updateWithAnimation('nationalInsurance', Math.round(data.calculations.national_insurance));
-                        }
-                        if (data.calculations.health_insurance) {
-                            updateWithAnimation('healthInsurance', Math.round(data.calculations.health_insurance));
-                        }
-                        if (data.calculations.total_deductions) {
-                            updateWithAnimation('totalDeductions', Math.round(data.calculations.total_deductions));
-                        }
-                        
-                        taxableIncomeSection.style.display = 'block';
-                    } else {
-                        taxableIncomeSection.style.display = 'none';
                     }
 
-                    document.getElementById('error').style.display = 'none';
+                    if (hasNegativeAmount) {
+                        // מציג את השגיאה
+                        alert(`לא ניתן להוון סכום זה בפטור!\nהסכום המקסימלי להיוון פטור הינו בסך ${formatNumber(maxPositiveAmount)} ₪`);
+                    }
+
+                    // Update table with results
+                    updateTableValues(result.calculations);
+                    
+                    // Show results section
+                    document.getElementById('results').style.display = 'block';
+                    
+                    // Scroll to results
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
                 } catch (error) {
                     document.getElementById('error').textContent = 'אירעה שגיאה בחישוב. אנא נסה שנית.';
                     document.getElementById('error').style.display = 'block';
@@ -604,87 +660,63 @@
                 }
             });
 
-            document.querySelectorAll('.form-control').forEach(input => {
-                input.addEventListener('focus', () => {
-                    input.parentElement.classList.add('animate__animated', 'animate__pulse');
-                });
-                input.addEventListener('blur', () => {
-                    input.parentElement.classList.remove('animate__animated', 'animate__pulse');
-                });
+            // Event listeners for conversion calculations
+            document.getElementById('waiver_amount').addEventListener('input', function(e) {
+                const value = parseFloat(e.target.value) || 0;
+                const result = value * 180;
+                document.getElementById('waiver_result').textContent = `תמורת משיכה הונית: ${formatNumber(result)} ₪`;
             });
 
-            function showInputSummary() {
-                // יצירת סיכום הנתונים שהוזנו
-                const inputSummary = document.createElement('div');
-                inputSummary.className = 'input-summary card rtl-content show-for-print';
-                
-                const title = document.createElement('h3');
-                title.className = 'section-title';
-                title.innerHTML = '<i class="fas fa-keyboard"></i> נתונים שהוזנו';
-                inputSummary.appendChild(title);
+            document.getElementById('capital_amount').addEventListener('input', function(e) {
+                const value = parseFloat(e.target.value) || 0;
+                const result = value / 180;
+                document.getElementById('capital_result').textContent = `תמורת ויתור פטור קצבה: ${formatNumber(result)} ₪`;
+            });
 
-                const inputs = [
-                    { label: 'תאריך לידה', value: document.getElementById('birthDate').value },
-                    { label: 'תאריך תחילת קבלת פנסיה', value: document.getElementById('pensionStartDate').value },
-                    { label: 'מגדר', value: document.querySelector('input[name="gender"]:checked').value === 'male' ? 'זכר' : 'נקבה' },
-                    { label: 'מענקי פרישה ופיצויים', value: document.getElementById('severanceAmount').value + ' ₪' },
-                    { label: 'סכום ההיוון הפטור', value: document.getElementById('exemptCapital').value + ' ₪' },
-                    { label: 'גובה פנסיה חודשית', value: document.getElementById('monthlyPension').value + ' ₪' },
-                    { label: 'הכנסה חודשית נוספת', value: (document.getElementById('additionalIncome').value || '0') + ' ₪' }
+            // Update table values
+            function updateTableValues(data) {
+                const years = [2024, 2025, 2026, 2027, 2028];
+                const fields = [
+                    'max_monthly_exemption',
+                    'exemption_addition',
+                    'exemption_rate',
+                    'taxable_monthly_income',
+                    'marginal_tax_rate',
+                    'monthly_tax',
+                    'monthly_net_income',
+                    'waiver_for_no_tax',
+                    'remaining_exempt_capital',
+                    'capital_addition'
                 ];
 
-                inputs.forEach(input => {
-                    const row = document.createElement('div');
-                    row.className = 'result-row';
-                    row.innerHTML = `
-                        <span class="label">${input.label}:</span>
-                        <span class="value">${input.value}</span>
-                    `;
-                    inputSummary.appendChild(row);
-                });
-
-                // הסרת סיכום קודם אם קיים
-                const oldSummary = document.querySelector('.input-summary');
-                if (oldSummary) {
-                    oldSummary.remove();
-                }
-
-                // הוספת הסיכום החדש לפני התוצאות
-                const resultsSection = document.getElementById('results');
-                resultsSection.insertBefore(inputSummary, resultsSection.firstChild);
-            }
-
-            function printDocument() {
-                showInputSummary();
-                window.print();
-            }
-
-            function exportToPDF() {
-                showInputSummary();
-                
-                // שינוי הכותרת של חלון ההדפסה ל-PDF
-                const style = document.createElement('style');
-                style.textContent = `
-                    @media print {
-                        @page {
-                            size: A4;
-                            margin: 1.5cm;
-                        }
+                years.forEach(year => {
+                    const yearData = data[year];
+                    if (yearData) {
+                        fields.forEach(field => {
+                            const element = document.getElementById(`${field}_${year}`);
+                            if (element) {
+                                let value = yearData[field];
+                                if (value !== null && value !== undefined) {
+                                    // Format numbers
+                                    if (field.includes('rate')) {
+                                        element.textContent = value.toFixed(1);
+                                    } else {
+                                        element.textContent = formatNumber(value);
+                                    }
+                                } else {
+                                    element.textContent = '0';
+                                }
+                            }
+                        });
                     }
-                `;
-                document.head.appendChild(style);
+                });
+            }
 
-                // פתיחת חלון הדפסה עם הגדרות מותאמות ל-PDF
-                const printOptions = {
-                    destination: 'Save as PDF',
-                    shouldPrintBackgrounds: true,
-                    printBackground: true
-                };
-
-                window.print();
-                
-                // הסרת הסגנון המיוחד
-                document.head.removeChild(style);
+            function formatNumber(num) {
+                return num.toLocaleString('he-IL', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }) + ' ₪';
             }
         </script>
     </body>
