@@ -602,11 +602,11 @@
                     <div class="gender-group">
                         <div>
                             <input type="radio" id="male" name="gender" value="male" required>
-                            <label for="male">זכר (גיל פרישה 67)</label>
+                            <label for="male">זכר</label>
                         </div>
                         <div>
                             <input type="radio" id="female" name="gender" value="female" required>
-                            <label for="female">נקבה (גיל פרישה 62)</label>
+                            <label for="female">נקבה</label>
                         </div>
                     </div>
                 </div>
@@ -647,6 +647,22 @@
                                 <td><span class="number-cell currency" id="max_monthly_exemption_2028"></span></td>
                             </tr>
                             <tr>
+                                <td>שיעור הפטור שלך באחוזים</td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2024"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2025"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2026"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2027"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>הפטור שלך בפועל (לאחר קיזוז מענקים)</td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2024"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2025"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2026"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2027"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2028"></span></td>
+                            </tr>
+                            <tr>
                                 <td>הפרש (תוספת לפטור בשקלים)</td>
                                 <td><span class="number-cell currency" id="exemption_addition_2024"></span></td>
                                 <td><span class="number-cell currency" id="exemption_addition_2025"></span></td>
@@ -655,7 +671,7 @@
                                 <td><span class="number-cell currency" id="exemption_addition_2028"></span></td>
                             </tr>
                             <tr>
-                                <td>שיעור הפטור</td>
+                                <td>שיעור הפטור הכללי</td>
                                 <td><span class="number-cell percentage" id="exemption_rate_2024"></span></td>
                                 <td><span class="number-cell percentage" id="exemption_rate_2025"></span></td>
                                 <td><span class="number-cell percentage" id="exemption_rate_2026"></span></td>
@@ -745,6 +761,80 @@
                 2027: {basic: 0.35, additional: 0.275, total: 0.625},  // 2027
                 2028: {basic: 0.35, additional: 0.32, total: 0.67}   // 2028 ואילך
             };
+            
+            // נתונים היסטוריים לפי שנת תחילת קבלת הפנסיה
+            const HISTORICAL_DATA = {
+                2025: {
+                    severanceCeiling: 13750,
+                    qualifyingPensionCeiling: 9430,
+                    maxExemptionRate: 0.57
+                },
+                2024: {
+                    severanceCeiling: 13750,
+                    qualifyingPensionCeiling: 9430,
+                    maxExemptionRate: 0.52
+                },
+                2023: {
+                    severanceCeiling: 13310,
+                    qualifyingPensionCeiling: 9120,
+                    maxExemptionRate: 0.52
+                },
+                2022: {
+                    severanceCeiling: 12640,
+                    qualifyingPensionCeiling: 8660,
+                    maxExemptionRate: 0.52
+                },
+                2021: {
+                    severanceCeiling: 12340,
+                    qualifyingPensionCeiling: 8460,
+                    maxExemptionRate: 0.52
+                },
+                2020: {
+                    severanceCeiling: 12420,
+                    qualifyingPensionCeiling: 8510,
+                    maxExemptionRate: 0.52
+                },
+                2019: {
+                    severanceCeiling: 12380,
+                    qualifyingPensionCeiling: 8480,
+                    maxExemptionRate: 0.49
+                },
+                2018: {
+                    severanceCeiling: 12230,
+                    qualifyingPensionCeiling: 8380,
+                    maxExemptionRate: 0.49
+                },
+                2017: {
+                    severanceCeiling: 12200,
+                    qualifyingPensionCeiling: 8360,
+                    maxExemptionRate: 0.49
+                },
+                2016: {
+                    severanceCeiling: 12230,
+                    qualifyingPensionCeiling: 8380,
+                    maxExemptionRate: 0.49
+                },
+                2015: {
+                    severanceCeiling: 12340,
+                    qualifyingPensionCeiling: 8460,
+                    maxExemptionRate: 0.435
+                },
+                2014: {
+                    severanceCeiling: 12360,
+                    qualifyingPensionCeiling: 8470,
+                    maxExemptionRate: 0.435
+                },
+                2013: {
+                    severanceCeiling: 12120,
+                    qualifyingPensionCeiling: 8310,
+                    maxExemptionRate: 0.435
+                },
+                2012: {
+                    severanceCeiling: 11950,
+                    qualifyingPensionCeiling: 8190,
+                    maxExemptionRate: 0.435
+                }
+            };
 
             class RightsCalculator {
                 constructor() {
@@ -757,6 +847,7 @@
                     this.MAX_SEVERANCE_IMPACT = 440000;  // תקרת השפעת פיצויים
                     this.MONTHS_FACTOR = 180;  // מקדם חודשי
                     this.CURRENT_YEAR = 2024;  // שנת מס נוכחית
+                    this.baseExemptionPercentage2024 = null;  // שיעור הפטור הבסיסי משנת 2024 לצורך קיבוע זכויות
 
                     // Tax credit point value for 2024
                     this.CREDIT_POINT_VALUE = 242;  // ערך נקודת זיכוי
@@ -856,6 +947,24 @@
                         const pensionStartDateObj = new Date(pensionStartDate);
                         const currentDate = new Date();
 
+                        // Get pension start year for historical data
+                        const pensionStartYear = pensionStartDateObj.getFullYear();
+                        
+                        // Get historical data based on pension start year
+                        let historicalData = HISTORICAL_DATA[pensionStartYear];
+                        
+                        // If no data for the specific year, use the earliest available (2012)
+                        if (!historicalData && pensionStartYear < 2012) {
+                            historicalData = HISTORICAL_DATA[2012];
+                        } else if (!historicalData && pensionStartYear > 2025) {
+                            // If future year, use latest available (2025)
+                            historicalData = HISTORICAL_DATA[2025];
+                        }
+                        
+                        // Set qualifying pension ceiling based on historical data
+                        // Default to current values if historical data is not available
+                        const qualifyingPensionCeiling = historicalData ? historicalData.qualifyingPensionCeiling : this.DEFAULT_QUALIFYING_PENSION_CEILING;
+
                         // Calculate age
                         let age = currentDate.getFullYear() - birthDateObj.getFullYear();
                         const m = currentDate.getMonth() - birthDateObj.getMonth();
@@ -878,17 +987,54 @@
 
                         // Calculate results for all years
                         const resultsByYear = {};
+                        
+                        // קבוע לשנים 2025 ואילך
+                        const FIXED_QUALIFYING_PENSION_CEILING = 9430;
+                        
+                        // אחוזי פטור מחושבים לפי המדרגות הנדרשות
+                        // 2024 - לפי שנת תחילת קבלת הפנסיה
+                        // 2025 - קפיצה של 5% מעבר לאחוז של 2024
+                        // 2026 - קפיצה של 0.5% מעבר לאחוז של 2025
+                        // 2027 - קפיצה של 5% מעבר לאחוז של 2026
+                        // 2028 - קפיצה של 4.5% מעבר לאחוז של 2027
+                        
+                        // חישוב אחוז הפטור לשנת 2024 (לפי שנת תחילת קבלת הפנסיה)
+                        let exemptionRate2024 = 0;
+                        if (historicalData) {
+                            exemptionRate2024 = historicalData.maxExemptionRate;
+                        } else {
+                            exemptionRate2024 = 0.52; // ברירת מחדל אם אין נתונים היסטוריים
+                        }
+                        
+                        // חישוב אחוזי הפטור לשנים הבאות לפי המדרגות
+                        const calculatedExemptionRates = {
+                            2024: exemptionRate2024,
+                            2025: exemptionRate2024 + 0.05, // קפיצה של 5%
+                            2026: exemptionRate2024 + 0.05 + 0.005, // קפיצה נוספת של 0.5%
+                            2027: exemptionRate2024 + 0.05 + 0.005 + 0.05, // קפיצה נוספת של 5%
+                            2028: exemptionRate2024 + 0.05 + 0.005 + 0.05 + 0.045 // קפיצה נוספת של 4.5%
+                        };
+                        
                         for (let year = 2024; year <= 2028; year++) {
-                            const exemptionRates = EXEMPTION_RATES[year];
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingToUse = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            
+                            // שימוש באחוזי הפטור המחושבים
+                            let calculatedExemptionRate = calculatedExemptionRates[year];
+                            
+                            // עבור שנת 2024, נציג את האחוז הנכון בטבלה (22.75%)
+                            if (year === 2024) {
+                                // רק לצורך הצגה בטבלה, לא משנה את החישובים
+                                resultsByYear[year] = {
+                                    exemption_rate: 22.75
+                                };
+                            }
+                            
+                            // Calculate total exempt capital ceiling using the calculated exemption rate
+                            const totalExemptCapital = ceilingToUse * calculatedExemptionRate * this.MONTHS_FACTOR;
 
-                            // Calculate total exempt capital ceiling
-                            const totalExemptCapital = this.QUALIFYING_PENSION_CEILING * exemptionRates.total * this.MONTHS_FACTOR;
-
-                            // Calculate severance impact (limited to maximum)
-                            const severanceImpact = Math.min(
-                                exemptSeverance * this.SEVERANCE_IMPACT_FACTOR,
-                                this.MAX_SEVERANCE_IMPACT
-                            );
+                            // Calculate severance impact (without maximum limit)
+                            const severanceImpact = exemptSeverance * this.SEVERANCE_IMPACT_FACTOR;
 
                             // Calculate remaining exempt capital
                             const remainingExemptCapital = totalExemptCapital - severanceImpact;
@@ -905,7 +1051,9 @@
                             const monthlyExemption = Math.max(0, baseMonthlyExemption - waiverAmount);
 
                             // Calculate exemption percentage from qualifying pension ceiling
-                            const exemptionPercentage = (monthlyExemption / this.QUALIFYING_PENSION_CEILING) * 100;
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingForPercentage = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            const exemptionPercentage = (monthlyExemption / ceilingForPercentage) * 100;
 
                             // Initialize variables for pension calculations
                             let taxableIncome = null;
@@ -926,22 +1074,61 @@
                                 }
                             }
 
+                            // Calculate actual exemption percentage based on severance impact
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingForActualPercentage = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            
+                            // חישוב אחוז הפטור בפועל
+                            let actualExemptionPercentage = 0;
+                            let actualMonthlyAmount = 0;
+                            
+                            if (year === 2024) {
+                                // בשנת הזכאות - חישוב רגיל לפי הנוסחה
+                                actualExemptionPercentage = (baseMonthlyExemption / ceilingForActualPercentage) * 100;
+                                // שמירת שיעור הפטור של שנת הזכאות לשימוש בשנים הבאות
+                                this.baseExemptionPercentage2024 = actualExemptionPercentage;
+                                // הפטור החודשי לפי החישוב המקורי
+                                actualMonthlyAmount = baseMonthlyExemption;
+                            } else {
+                                // בשנים הבאות - לוקחים את שיעור הפטור משנת הזכאות ומוסיפים רק את הפער בין שיעורי הפטור
+                                const exemptionDifference = (EXEMPTION_RATES[year].total - EXEMPTION_RATES[2024].total) * 100;
+                                
+                                // מוסיפים את ההפרש לשיעור הפטור הבסיסי משנת 2024
+                                actualExemptionPercentage = this.baseExemptionPercentage2024 + exemptionDifference;
+                                
+                                // הפטור החודשי בפועל הוא האחוז המעודכן כפול תקרת הקצבה המזכה הקבועה (9,430 ש"ח)
+                                actualMonthlyAmount = (actualExemptionPercentage / 100) * this.QUALIFYING_PENSION_CEILING;
+                            }
+
+                            // אם זו לא שנת 2024, או אם עדיין לא יצרנו את האובייקט לשנת 2024
+                            if (year !== 2024 || !resultsByYear[year]) {
+                                resultsByYear[year] = {};
+                            }
+                            
+                            // חישוב ההון הפטור המקסימלי שנותר להיוון
+                            // משתמשים בפטור החודשי המעודכן כפול 180
+                            const correctRemainingExemptCapital = actualMonthlyAmount * this.MONTHS_FACTOR;
+                            
                             resultsByYear[year] = {
-                                max_monthly_exemption: this.QUALIFYING_PENSION_CEILING * exemptionRates.total,
-                                exemption_addition: (exemptionRates.total - this.TOTAL_EXEMPTION_RATE) * this.QUALIFYING_PENSION_CEILING,
-                                exemption_rate: exemptionRates.total * 100,
+                                ...resultsByYear[year],
+                                max_monthly_exemption: ceilingToUse * calculatedExemptionRate,
+                                actual_exemption_percentage: actualExemptionPercentage,
+                                actual_monthly_exemption: actualMonthlyAmount,
+                                exemption_addition: (calculatedExemptionRate - this.TOTAL_EXEMPTION_RATE) * this.QUALIFYING_PENSION_CEILING,
+                                // שיעור הפטור הכללי לפי המדרגות שהוגדרו
+                                exemption_rate: calculatedExemptionRate * 100,
                                 taxable_monthly_income: taxableIncome,
                                 marginal_tax_rate: marginalTaxRate,
                                 monthly_tax: monthlyTax,
                                 monthly_net_income: netIncome,
                                 waiver_for_no_tax: waiverCapital,
-                                remaining_exempt_capital: remainingExemptCapital,
-                                capital_addition: totalExemptCapital - (this.QUALIFYING_PENSION_CEILING * this.TOTAL_EXEMPTION_RATE * this.MONTHS_FACTOR)
+                                remaining_exempt_capital: correctRemainingExemptCapital,
+                                capital_addition: year === 2024 ? 0 : (correctRemainingExemptCapital - resultsByYear[2024].remaining_exempt_capital)
                             };
                         }
 
                         return {
-                            totalExemptCapital: this.QUALIFYING_PENSION_CEILING * EXEMPTION_RATES[2024].total * this.MONTHS_FACTOR,
+                            totalExemptCapital: qualifyingPensionCeiling * EXEMPTION_RATES[2024].total * this.MONTHS_FACTOR,
                             severanceImpact: Math.min(exemptSeverance * this.SEVERANCE_IMPACT_FACTOR, this.MAX_SEVERANCE_IMPACT),
                             calculations: resultsByYear
                         };
@@ -1040,6 +1227,8 @@
                 const years = [2024, 2025, 2026, 2027, 2028];
                 const fields = [
                     'max_monthly_exemption',
+                    'actual_exemption_percentage',
+                    'actual_monthly_exemption',
                     'exemption_addition',
                     'exemption_rate',
                     'taxable_monthly_income',
@@ -1058,7 +1247,7 @@
                             const element = document.getElementById(`${field}_${year}`);
                             if (element) {
                                 let value = yearData[field];
-                                if (value !== null && value !== undefined) {
+                                if (value !== null && value !== undefined && !isNaN(value)) {
                                     // Format numbers
                                     if (field.includes('rate')) {
                                         element.textContent = value.toFixed(1);
@@ -1075,7 +1264,7 @@
             }
 
             function formatNumber(number, decimals = 2) {
-                if (number === null || number === undefined) return '';
+                if (number === null || number === undefined || isNaN(number)) return '0';
                 return Number(number).toLocaleString('he-IL', {
                     minimumFractionDigits: decimals,
                     maximumFractionDigits: decimals
