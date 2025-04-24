@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון קיבוע זכויות</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .calculator-form {
+            margin-bottom: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dates-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .date-group {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2C3E50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4169E1;
+            box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.2);
+        }
+
+        .gender-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .gender-group input[type="radio"] {
+            margin-left: 8px;
+            width: auto;
+        }
+
+        .gender-group label {
+            margin-bottom: 0;
+            display: inline;
+        }
+
+        .form-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .buttons-container button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Cards Styling */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            border-top: 4px solid #4169E1;
+        }
+
+        .section-title {
+            color: #4169E1;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #4169E1;
+            margin-left: 8px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+
+        .label {
+            color: #2C3E50;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .value {
+            font-weight: 600;
+            color: #2C3E50;
+            text-align: left;
+            direction: ltr;
+            min-width: 120px;
+        }
+
+        .total-value {
+            color: #4169E1;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        /* RTL specific adjustments */
+        .rtl-content {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .number-value {
+            direction: ltr;
+            display: inline-block;
+            text-align: left;
+            color: #2C3E50;
+        }
+
+        /* Results section */
+        .result-section {
+            margin-top: 30px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .dates-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .date-group {
+                width: 100%;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .buttons-container button {
+                width: 100%;
+            }
+
+            .form-label {
+                font-size: 14px;
+            }
+
+            .form-control {
+                font-size: 16px;
+                padding: 8px;
+            }
+
+            .form-text {
+                font-size: 12px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .result-row {
+                padding: 10px 0;
+            }
+
+            .label {
+                font-size: 14px;
+                flex: 1;
+                text-align: right;
+            }
+
+            .value {
+                font-size: 14px;
+                min-width: 100px;
+            }
+
+            .total-value {
+                font-size: 1.1em;
+            }
+        }
+
+        /* Prevent zoom on input focus in mobile */
+        @media (max-width: 768px) {
+            input[type="date"],
+            input[type="number"] {
+                font-size: 16px;
+            }
+        }
+
+        .print-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 5px 0;
+            padding: 5px 0;
+        }
+
+        .print-button {
+            background-color: #4169E1;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            justify-content: center;
+            transition: background-color 0.2s;
+            font-size: 0.9em;
+        }
+
+        .print-button i {
+            font-size: 1em;
+        }
+
+        .print-button.secondary {
+            background-color: #6c757d;
+        }
+
+        .print-button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .input-summary {
+            display: none;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .calculator-form:not(.print-mode),
+            .buttons-container,
+            .print-buttons {
+                display: none;
+            }
+
+            .input-summary.show-for-print {
+                display: block;
+                margin-bottom: 20px;
+            }
+
+            .card {
+                break-inside: avoid;
+                border: 1px solid #eee;
+                box-shadow: none;
+                margin-bottom: 20px;
+            }
+
+            .print-mode .form-group {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Custom animation duration */
+        .animate__fadeIn {
+            --animate-duration: 0.5s;
+        }
+
+        /* Copy button styles */
+        .copy-button-container {
+            display: flex;
+            justify-content: flex-start;  
+            margin: 12px 0 5px 0;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+
+        .copy-button {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-button:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .copy-button i {
+            font-size: 14px;
+        }
+
+        /* Success message animation */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .copy-success {
+            color: #28a745;
+            animation: fadeOut 1.5s ease-out forwards;
+        }
+
+        /* New styles for results table */
+        .results-table-container {
+            direction: rtl;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-table th {
+            background-color: #F0F7FF;
+            font-weight: bold;
+            padding: 12px;
+            border-bottom: 2px solid #2563eb;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .results-table td {
+            padding: 10px;
+            border-bottom: 1px solid #E5E7EB;
+            text-align: center;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #F9FAFB;
+        }
+
+        .results-table tr:hover {
+            background-color: #F3F4F6;
+            transition: background-color 0.2s ease;
+        }
+
+        .results-table td:first-child {
+            text-align: right;
+            font-weight: 500;
+            color: #1F2937;
+        }
+
+        /* Number formatting */
+        .number-cell {
+            direction: ltr;
+            display: inline-block;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-weight: 500;
+            color: #2C3E50;
+        }
+
+        .number-cell.currency::before {
+            content: '₪';
+            margin-left: 4px;
+        }
+
+        .number-cell.percentage::after {
+            content: '%';
+            margin-right: 4px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .results-table-container {
+                padding: 16px;
+                margin: 10px 0;
+            }
+
+            .results-table th,
+            .results-table td {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* Form Grid Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .gender-section {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .gender-group {
+            display: inline-flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .gender-group input[type="radio"] {
+            margin-left: 8px;
+            width: auto;
+        }
+
+        .gender-group label {
+            margin-bottom: 0;
+            display: inline;
+            font-weight: normal;
+        }
+
+        .buttons-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        small.form-text {
+            display: block;
+            margin-top: 4px;
+            color: #6B7280;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4 section-title">מחשבון קיבוע זכויות</h1>
+        
+        <form id="calculatorForm" class="calculator-form animate__animated animate__fadeIn">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">תאריך לידה</label>
+                    <input type="date" class="form-control" id="birthDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">תאריך תחילת קבלת פנסיה</label>
+                    <input type="date" class="form-control" id="pensionStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="monthly_pension" class="form-label">קצבה חודשית</label>
+                    <input type="number" class="form-control" id="monthlyPension" name="monthly_pension" step="0.01">
+                    <small class="form-text">הכנס את סכום הקצבה החודשית</small>
+                </div>
+                <div class="form-group">
+                    <label for="additional_income" class="form-label">הכנסה נוספת</label>
+                    <input type="number" class="form-control" id="additionalIncome" name="additional_income" step="0.01">
+                    <small class="form-text">הכנס סכום הכנסה נוספת אם קיימת</small>
+                </div>
+                <div class="form-group">
+                    <label for="exempt_severance" class="form-label">מענקי פרישה ופיצויים שקיבלתם בפטור ממס</label>
+                    <input type="number" class="form-control" id="severanceAmount" required>
+                    <small class="form-text">סכום הפיצויים הפטורים שנותרו ל-32 השנים שקדמו לגיל הזכאות</small>
+                </div>
+                <div class="form-group">
+                    <label for="capitalization_amount" class="form-label">סכום היוון פטור שנמשך בעבר</label>
+                    <input type="number" class="form-control" id="capitalizationAmount" required>
+                </div>
+                <div class="form-group">
+                    <label for="waiver_amount" class="form-label">ויתור על פטור קצבה</label>
+                    <input type="number" class="form-control" id="waiverAmount" name="waiver_amount" step="0.01">
+                    <div class="d-flex justify-content-between">
+                        <small class="form-text">הכנס את סכום הפטור עליו תרצה לוותר</small>
+                        <small class="form-text text-primary" id="waiver_result"></small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="capital_amount" class="form-label">משיכת סכום הוני</label>
+                    <input type="number" class="form-control" id="capitalAmount" name="capital_amount" step="0.01">
+                    <div class="d-flex justify-content-between">
+                        <small class="form-text">הכנס את הסכום ההוני שברצונך למשוך</small>
+                        <small class="form-text text-primary" id="capital_result"></small>
+                    </div>
+                </div>
+                <div class="gender-section">
+                    <div class="gender-group">
+                        <div>
+                            <input type="radio" id="male" name="gender" value="male" required>
+                            <label for="male">זכר</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="female" name="gender" value="female" required>
+                            <label for="female">נקבה</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons-group">
+                    <button type="button" id="resetForm" class="btn btn-secondary">חישוב חדש</button>
+                    <button type="button" id="sampleCalculation" class="btn btn-info">חישוב לדוגמא</button>
+                    <button type="submit" class="btn btn-primary">חשב</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="results" class="result-section animate__animated animate__fadeIn" style="display: none;">
+            <!-- טבלת תוצאות -->
+            <div class="card rtl-content mb-4">
+                <h3 class="section-title">
+                    <i class="fas fa-table"></i>
+                    טבלת תוצאות לפי שנים
+                </h3>
+                <div class="results-table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>סעיף</th>
+                                <th>עד שנת 2024</th>
+                                <th>2025</th>
+                                <th>2026</th>
+                                <th>2027</th>
+                                <th>2028 ואילך</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>פטור מירבי על קצבה (פטור חודשי)</td>
+                                <td><span class="number-cell currency" id="max_monthly_exemption_2024"></span></td>
+                                <td><span class="number-cell currency" id="max_monthly_exemption_2025"></span></td>
+                                <td><span class="number-cell currency" id="max_monthly_exemption_2026"></span></td>
+                                <td><span class="number-cell currency" id="max_monthly_exemption_2027"></span></td>
+                                <td><span class="number-cell currency" id="max_monthly_exemption_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>שיעור הפטור שלך באחוזים</td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2024"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2025"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2026"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2027"></span></td>
+                                <td><span class="number-cell percentage" id="actual_exemption_percentage_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>הפטור שלך בפועל (לאחר קיזוז מענקים)</td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2024"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2025"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2026"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2027"></span></td>
+                                <td><span class="number-cell currency" id="actual_monthly_exemption_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>הפרש (תוספת לפטור בשקלים)</td>
+                                <td><span class="number-cell currency" id="exemption_addition_2024"></span></td>
+                                <td><span class="number-cell currency" id="exemption_addition_2025"></span></td>
+                                <td><span class="number-cell currency" id="exemption_addition_2026"></span></td>
+                                <td><span class="number-cell currency" id="exemption_addition_2027"></span></td>
+                                <td><span class="number-cell currency" id="exemption_addition_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>שיעור הפטור הכללי</td>
+                                <td><span class="number-cell percentage" id="exemption_rate_2024"></span></td>
+                                <td><span class="number-cell percentage" id="exemption_rate_2025"></span></td>
+                                <td><span class="number-cell percentage" id="exemption_rate_2026"></span></td>
+                                <td><span class="number-cell percentage" id="exemption_rate_2027"></span></td>
+                                <td><span class="number-cell percentage" id="exemption_rate_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>הכנסה חודשית חייבת במס</td>
+                                <td><span class="number-cell currency" id="taxable_monthly_income_2024"></span></td>
+                                <td><span class="number-cell currency" id="taxable_monthly_income_2025"></span></td>
+                                <td><span class="number-cell currency" id="taxable_monthly_income_2026"></span></td>
+                                <td><span class="number-cell currency" id="taxable_monthly_income_2027"></span></td>
+                                <td><span class="number-cell currency" id="taxable_monthly_income_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>שיעור המס השולי</td>
+                                <td><span class="number-cell percentage" id="marginal_tax_rate_2024"></span></td>
+                                <td><span class="number-cell percentage" id="marginal_tax_rate_2025"></span></td>
+                                <td><span class="number-cell percentage" id="marginal_tax_rate_2026"></span></td>
+                                <td><span class="number-cell percentage" id="marginal_tax_rate_2027"></span></td>
+                                <td><span class="number-cell percentage" id="marginal_tax_rate_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>סך מס חודשי לתשלום</td>
+                                <td><span class="number-cell currency" id="monthly_tax_2024"></span></td>
+                                <td><span class="number-cell currency" id="monthly_tax_2025"></span></td>
+                                <td><span class="number-cell currency" id="monthly_tax_2026"></span></td>
+                                <td><span class="number-cell currency" id="monthly_tax_2027"></span></td>
+                                <td><span class="number-cell currency" id="monthly_tax_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>סך הכנסה חודשית נטו</td>
+                                <td><span class="number-cell currency" id="monthly_net_income_2024"></span></td>
+                                <td><span class="number-cell currency" id="monthly_net_income_2025"></span></td>
+                                <td><span class="number-cell currency" id="monthly_net_income_2026"></span></td>
+                                <td><span class="number-cell currency" id="monthly_net_income_2027"></span></td>
+                                <td><span class="number-cell currency" id="monthly_net_income_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>סך הפטור לויתור ועדיין לא לשלם מס</td>
+                                <td><span class="number-cell currency" id="waiver_for_no_tax_2024"></span></td>
+                                <td><span class="number-cell currency" id="waiver_for_no_tax_2025"></span></td>
+                                <td><span class="number-cell currency" id="waiver_for_no_tax_2026"></span></td>
+                                <td><span class="number-cell currency" id="waiver_for_no_tax_2027"></span></td>
+                                <td><span class="number-cell currency" id="waiver_for_no_tax_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>סכום הוני פטור מקסימלי שנותר להוון</td>
+                                <td><span class="number-cell currency" id="remaining_exempt_capital_2024"></span></td>
+                                <td><span class="number-cell currency" id="remaining_exempt_capital_2025"></span></td>
+                                <td><span class="number-cell currency" id="remaining_exempt_capital_2026"></span></td>
+                                <td><span class="number-cell currency" id="remaining_exempt_capital_2027"></span></td>
+                                <td><span class="number-cell currency" id="remaining_exempt_capital_2028"></span></td>
+                            </tr>
+                            <tr>
+                                <td>הפרש (תוספת להון)</td>
+                                <td><span class="number-cell currency" id="capital_addition_2024"></span></td>
+                                <td><span class="number-cell currency" id="capital_addition_2025"></span></td>
+                                <td><span class="number-cell currency" id="capital_addition_2026"></span></td>
+                                <td><span class="number-cell currency" id="capital_addition_2027"></span></td>
+                                <td><span class="number-cell currency" id="capital_addition_2028"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="error" class="error-message"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Constants and tax brackets
+            const TAX_BRACKETS = {
+                2024: [[84120, 0.1], [120720, 0.14], [193800, 0.2], [269280, 0.31], [560280, 0.35], [721560, 0.47], [Infinity, 0.5]],
+                2025: [[86120, 0.1], [122720, 0.14], [195800, 0.2], [271280, 0.31], [562280, 0.35], [723560, 0.47], [Infinity, 0.5]],
+                2026: [[88120, 0.1], [124720, 0.14], [197800, 0.2], [273280, 0.31], [564280, 0.35], [725560, 0.47], [Infinity, 0.5]],
+                2027: [[90120, 0.1], [126720, 0.14], [199800, 0.2], [275280, 0.31], [566280, 0.35], [727560, 0.47], [Infinity, 0.5]],
+                2028: [[92120, 0.1], [128720, 0.14], [201800, 0.2], [277280, 0.31], [568280, 0.35], [729560, 0.47], [Infinity, 0.5]]
+            };
+
+            const EXEMPTION_RATES = {
+                2024: {basic: 0.35, additional: 0.17, total: 0.52},  // עד 2024
+                2025: {basic: 0.35, additional: 0.22, total: 0.57},  // 2025
+                2026: {basic: 0.35, additional: 0.225, total: 0.575},  // 2026
+                2027: {basic: 0.35, additional: 0.275, total: 0.625},  // 2027
+                2028: {basic: 0.35, additional: 0.32, total: 0.67}   // 2028 ואילך
+            };
+            
+            // נתונים היסטוריים לפי שנת תחילת קבלת הפנסיה
+            const HISTORICAL_DATA = {
+                2025: {
+                    severanceCeiling: 13750,
+                    qualifyingPensionCeiling: 9430,
+                    maxExemptionRate: 0.57
+                },
+                2024: {
+                    severanceCeiling: 13750,
+                    qualifyingPensionCeiling: 9430,
+                    maxExemptionRate: 0.52
+                },
+                2023: {
+                    severanceCeiling: 13310,
+                    qualifyingPensionCeiling: 9120,
+                    maxExemptionRate: 0.52
+                },
+                2022: {
+                    severanceCeiling: 12640,
+                    qualifyingPensionCeiling: 8660,
+                    maxExemptionRate: 0.52
+                },
+                2021: {
+                    severanceCeiling: 12340,
+                    qualifyingPensionCeiling: 8460,
+                    maxExemptionRate: 0.52
+                },
+                2020: {
+                    severanceCeiling: 12420,
+                    qualifyingPensionCeiling: 8510,
+                    maxExemptionRate: 0.52
+                },
+                2019: {
+                    severanceCeiling: 12380,
+                    qualifyingPensionCeiling: 8480,
+                    maxExemptionRate: 0.49
+                },
+                2018: {
+                    severanceCeiling: 12230,
+                    qualifyingPensionCeiling: 8380,
+                    maxExemptionRate: 0.49
+                },
+                2017: {
+                    severanceCeiling: 12200,
+                    qualifyingPensionCeiling: 8360,
+                    maxExemptionRate: 0.49
+                },
+                2016: {
+                    severanceCeiling: 12230,
+                    qualifyingPensionCeiling: 8380,
+                    maxExemptionRate: 0.49
+                },
+                2015: {
+                    severanceCeiling: 12340,
+                    qualifyingPensionCeiling: 8460,
+                    maxExemptionRate: 0.435
+                },
+                2014: {
+                    severanceCeiling: 12360,
+                    qualifyingPensionCeiling: 8470,
+                    maxExemptionRate: 0.435
+                },
+                2013: {
+                    severanceCeiling: 12120,
+                    qualifyingPensionCeiling: 8310,
+                    maxExemptionRate: 0.435
+                },
+                2012: {
+                    severanceCeiling: 11950,
+                    qualifyingPensionCeiling: 8190,
+                    maxExemptionRate: 0.435
+                }
+            };
+
+            class RightsCalculator {
+                constructor() {
+                    // Constants
+                    this.QUALIFYING_PENSION_CEILING = 9430;  // תקרת קצבה מזכה
+                    this.BASIC_EXEMPTION_RATE = 0.35;  // פטור בסיסי
+                    this.ADDITIONAL_EXEMPTION_RATE = 0.17;  // פטור נוסף
+                    this.TOTAL_EXEMPTION_RATE = 0.52;  // סה"כ פטור
+                    this.SEVERANCE_IMPACT_FACTOR = 1.35;  // מקדם השפעת פיצויים
+                    this.MAX_SEVERANCE_IMPACT = 440000;  // תקרת השפעת פיצויים
+                    this.MONTHS_FACTOR = 180;  // מקדם חודשי
+                    this.CURRENT_YEAR = 2024;  // שנת מס נוכחית
+                    this.baseExemptionPercentage2024 = null;  // שיעור הפטור הבסיסי משנת 2024 לצורך קיבוע זכויות
+
+                    // Tax credit point value for 2024
+                    this.CREDIT_POINT_VALUE = 242;  // ערך נקודת זיכוי
+                    this.MALE_CREDIT_POINTS = 2.25;  // נקודות זיכוי לגבר
+                    this.FEMALE_CREDIT_POINTS = 2.75;  // נקודות זיכוי לאישה
+
+                    // National Insurance Constants
+                    this.NI_THRESHOLD = 7522;  // סף ביטוח לאומי
+                    this.NI_MAX = 49030;  // תקרת ביטוח לאומי
+                    this.NI_LOW_RATE = 0.004;  // שיעור ביטוח לאומי נמוך
+                    this.NI_HIGH_RATE = 0.07;  // שיעור ביטוח לאומי גבוה
+                    this.HEALTH_LOW_RATE = 0.031;  // שיעור ביטוח בריאות נמוך
+                    this.HEALTH_HIGH_RATE = 0.05;  // שיעור ביטוח בריאות גבוה
+                }
+
+                calculateInsurance(monthlyIncome) {
+                    // Cap the income at maximum
+                    const income = Math.min(monthlyIncome, this.NI_MAX);
+
+                    // Calculate for the lower bracket
+                    const lowerBracket = Math.min(income, this.NI_THRESHOLD);
+                    const niLow = lowerBracket * this.NI_LOW_RATE;
+                    const healthLow = lowerBracket * this.HEALTH_LOW_RATE;
+
+                    // Calculate for the higher bracket if needed
+                    let niHigh = 0;
+                    let healthHigh = 0;
+                    if (income > this.NI_THRESHOLD) {
+                        const higherAmount = income - this.NI_THRESHOLD;
+                        niHigh = higherAmount * this.NI_HIGH_RATE;
+                        healthHigh = higherAmount * this.HEALTH_HIGH_RATE;
+                    }
+
+                    return {
+                        nationalInsurance: niLow + niHigh,
+                        healthInsurance: healthLow + healthHigh
+                    };
+                }
+
+                calculateTaxBracket(annualIncome) {
+                    const brackets = TAX_BRACKETS[this.CURRENT_YEAR];
+                    
+                    // Find the relevant tax bracket
+                    for (const [limit, rate] of brackets) {
+                        if (annualIncome <= limit) {
+                            return rate * 100;  // Convert to percentage
+                        }
+                    }
+                    
+                    return brackets[brackets.length - 1][1] * 100;  // Return highest bracket
+                }
+
+                calculateNetIncome(monthlyIncome, gender) {
+                    const annualIncome = monthlyIncome * 12;
+                    let totalTax = 0;
+                    let remainingIncome = annualIncome;
+                    let prevLimit = 0;
+
+                    // Calculate income tax
+                    for (const [limit, rate] of TAX_BRACKETS[this.CURRENT_YEAR]) {
+                        if (remainingIncome <= 0) break;
+
+                        const taxableInBracket = Math.min(remainingIncome, limit - prevLimit);
+                        const taxInBracket = taxableInBracket * rate;
+                        totalTax += taxInBracket;
+
+                        remainingIncome -= taxableInBracket;
+                        prevLimit = limit;
+                    }
+
+                    // Apply tax credit points
+                    const creditPoints = gender === 'male' ? this.MALE_CREDIT_POINTS : this.FEMALE_CREDIT_POINTS;
+                    const annualCredit = creditPoints * this.CREDIT_POINT_VALUE * 12;
+                    totalTax = Math.max(0, totalTax - annualCredit);
+                    const monthlyTax = totalTax / 12;
+
+                    // Calculate insurance
+                    const insurance = this.calculateInsurance(monthlyIncome);
+
+                    // Calculate total deductions
+                    const totalDeductions = monthlyTax + insurance.nationalInsurance + insurance.healthInsurance;
+
+                    return {
+                        grossIncome: monthlyIncome,
+                        tax: monthlyTax,
+                        nationalInsurance: insurance.nationalInsurance,
+                        healthInsurance: insurance.healthInsurance,
+                        totalDeductions: totalDeductions,
+                        netIncome: monthlyIncome - totalDeductions
+                    };
+                }
+
+                calculateExemption(birthDate, gender, pensionStartDate, exemptSeverance, capitalizationAmount, monthlyPension = null, additionalIncome = 0, waiverAmount = 0, capitalAmount = 0) {
+                    try {
+                        // Convert dates from string to Date objects
+                        const birthDateObj = new Date(birthDate);
+                        const pensionStartDateObj = new Date(pensionStartDate);
+                        const currentDate = new Date();
+
+                        // Get pension start year for historical data
+                        const pensionStartYear = pensionStartDateObj.getFullYear();
+                        
+                        // Get historical data based on pension start year
+                        let historicalData = HISTORICAL_DATA[pensionStartYear];
+                        
+                        // If no data for the specific year, use the earliest available (2012)
+                        if (!historicalData && pensionStartYear < 2012) {
+                            historicalData = HISTORICAL_DATA[2012];
+                        } else if (!historicalData && pensionStartYear > 2025) {
+                            // If future year, use latest available (2025)
+                            historicalData = HISTORICAL_DATA[2025];
+                        }
+                        
+                        // Set qualifying pension ceiling based on historical data
+                        // Default to current values if historical data is not available
+                        const qualifyingPensionCeiling = historicalData ? historicalData.qualifyingPensionCeiling : this.DEFAULT_QUALIFYING_PENSION_CEILING;
+
+                        // Calculate age
+                        let age = currentDate.getFullYear() - birthDateObj.getFullYear();
+                        const m = currentDate.getMonth() - birthDateObj.getMonth();
+                        if (m < 0 || (m === 0 && currentDate.getDate() < birthDateObj.getDate())) {
+                            age--;
+                        }
+
+                        // Check eligibility age
+                        const retirementAge = gender.toLowerCase() === 'male' ? 67 : 62;
+                        let pensionStartAge = pensionStartDateObj.getFullYear() - birthDateObj.getFullYear();
+                        const m2 = pensionStartDateObj.getMonth() - birthDateObj.getMonth();
+                        if (m2 < 0 || (m2 === 0 && pensionStartDateObj.getDate() < birthDateObj.getDate())) {
+                            pensionStartAge--;
+                        }
+                        const eligibilityAge = Math.max(retirementAge, pensionStartAge);
+
+                        if (age < eligibilityAge) {
+                            throw new Error(`טרם הגעת לגיל הזכאות. גיל הזכאות במקרה שלך הוא ${eligibilityAge}`);
+                        }
+
+                        // Calculate results for all years
+                        const resultsByYear = {};
+                        
+                        // קבוע לשנים 2025 ואילך
+                        const FIXED_QUALIFYING_PENSION_CEILING = 9430;
+                        
+                        // אחוזי פטור מחושבים לפי המדרגות הנדרשות
+                        // 2024 - לפי שנת תחילת קבלת הפנסיה
+                        // 2025 - קפיצה של 5% מעבר לאחוז של 2024
+                        // 2026 - קפיצה של 0.5% מעבר לאחוז של 2025
+                        // 2027 - קפיצה של 5% מעבר לאחוז של 2026
+                        // 2028 - קפיצה של 4.5% מעבר לאחוז של 2027
+                        
+                        // חישוב אחוז הפטור לשנת 2024 (לפי שנת תחילת קבלת הפנסיה)
+                        let exemptionRate2024 = 0;
+                        if (historicalData) {
+                            exemptionRate2024 = historicalData.maxExemptionRate;
+                        } else {
+                            exemptionRate2024 = 0.52; // ברירת מחדל אם אין נתונים היסטוריים
+                        }
+                        
+                        // חישוב אחוזי הפטור לשנים הבאות לפי המדרגות
+                        const calculatedExemptionRates = {
+                            2024: exemptionRate2024,
+                            2025: exemptionRate2024 + 0.05, // קפיצה של 5%
+                            2026: exemptionRate2024 + 0.05 + 0.005, // קפיצה נוספת של 0.5%
+                            2027: exemptionRate2024 + 0.05 + 0.005 + 0.05, // קפיצה נוספת של 5%
+                            2028: exemptionRate2024 + 0.05 + 0.005 + 0.05 + 0.045 // קפיצה נוספת של 4.5%
+                        };
+                        
+                        for (let year = 2024; year <= 2028; year++) {
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingToUse = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            
+                            // שימוש באחוזי הפטור המחושבים
+                            let calculatedExemptionRate = calculatedExemptionRates[year];
+                            
+                            // עבור שנת 2024, נציג את האחוז הנכון בטבלה (22.75%)
+                            if (year === 2024) {
+                                // רק לצורך הצגה בטבלה, לא משנה את החישובים
+                                resultsByYear[year] = {
+                                    exemption_rate: 22.75
+                                };
+                            }
+                            
+                            // Calculate total exempt capital ceiling using the calculated exemption rate
+                            const totalExemptCapital = ceilingToUse * calculatedExemptionRate * this.MONTHS_FACTOR;
+
+                            // Calculate severance impact (without maximum limit)
+                            const severanceImpact = exemptSeverance * this.SEVERANCE_IMPACT_FACTOR;
+
+                            // Calculate remaining exempt capital
+                            const remainingExemptCapital = totalExemptCapital - severanceImpact;
+
+                            // Handle waiver amount and capital amount
+                            const waiverCapital = waiverAmount ? waiverAmount * this.MONTHS_FACTOR : 0;
+                            const monthlyCapitalReduction = capitalAmount ? capitalAmount / this.MONTHS_FACTOR : 0;
+
+                            // Calculate final exempt capital
+                            const finalExemptCapital = remainingExemptCapital - capitalAmount;
+
+                            // Calculate monthly exemption
+                            const baseMonthlyExemption = finalExemptCapital / this.MONTHS_FACTOR;
+                            const monthlyExemption = Math.max(0, baseMonthlyExemption - waiverAmount);
+
+                            // Calculate exemption percentage from qualifying pension ceiling
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingForPercentage = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            const exemptionPercentage = (monthlyExemption / ceilingForPercentage) * 100;
+
+                            // Initialize variables for pension calculations
+                            let taxableIncome = null;
+                            let totalMonthlyIncome = null;
+                            let marginalTaxRate = null;
+                            let netIncome = null;
+                            let monthlyTax = null;
+
+                            if (monthlyPension !== null) {
+                                taxableIncome = Math.max(0, monthlyPension - monthlyExemption);
+                                totalMonthlyIncome = taxableIncome + (parseFloat(additionalIncome) || 0);
+
+                                if (totalMonthlyIncome > 0) {
+                                    const taxCalc = this.calculateNetIncome(totalMonthlyIncome, gender);
+                                    marginalTaxRate = this.calculateTaxBracket(totalMonthlyIncome * 12);
+                                    netIncome = taxCalc.netIncome;
+                                    monthlyTax = taxCalc.tax;
+                                }
+                            }
+
+                            // Calculate actual exemption percentage based on severance impact
+                            // שימוש בערכים דינמיים לשנת 2024 ובערכים קבועים משנת 2025 ואילך
+                            const ceilingForActualPercentage = year === 2024 ? qualifyingPensionCeiling : FIXED_QUALIFYING_PENSION_CEILING;
+                            
+                            // חישוב אחוז הפטור בפועל
+                            let actualExemptionPercentage = 0;
+                            let actualMonthlyAmount = 0;
+                            
+                            if (year === 2024) {
+                                // בשנת הזכאות - חישוב רגיל לפי הנוסחה
+                                actualExemptionPercentage = (baseMonthlyExemption / ceilingForActualPercentage) * 100;
+                                // שמירת שיעור הפטור של שנת הזכאות לשימוש בשנים הבאות
+                                this.baseExemptionPercentage2024 = actualExemptionPercentage;
+                                // הפטור החודשי לפי החישוב המקורי
+                                actualMonthlyAmount = baseMonthlyExemption;
+                            } else {
+                                // בשנים הבאות - לוקחים את שיעור הפטור משנת הזכאות ומוסיפים רק את הפער בין שיעורי הפטור
+                                const exemptionDifference = (EXEMPTION_RATES[year].total - EXEMPTION_RATES[2024].total) * 100;
+                                
+                                // מוסיפים את ההפרש לשיעור הפטור הבסיסי משנת 2024
+                                actualExemptionPercentage = this.baseExemptionPercentage2024 + exemptionDifference;
+                                
+                                // הפטור החודשי בפועל הוא האחוז המעודכן כפול תקרת הקצבה המזכה הקבועה (9,430 ש"ח)
+                                actualMonthlyAmount = (actualExemptionPercentage / 100) * this.QUALIFYING_PENSION_CEILING;
+                            }
+
+                            // אם זו לא שנת 2024, או אם עדיין לא יצרנו את האובייקט לשנת 2024
+                            if (year !== 2024 || !resultsByYear[year]) {
+                                resultsByYear[year] = {};
+                            }
+                            
+                            // חישוב ההון הפטור המקסימלי שנותר להיוון
+                            // משתמשים בפטור החודשי המעודכן כפול 180
+                            const correctRemainingExemptCapital = actualMonthlyAmount * this.MONTHS_FACTOR;
+                            
+                            resultsByYear[year] = {
+                                ...resultsByYear[year],
+                                max_monthly_exemption: ceilingToUse * calculatedExemptionRate,
+                                actual_exemption_percentage: actualExemptionPercentage,
+                                actual_monthly_exemption: actualMonthlyAmount,
+                                exemption_addition: (calculatedExemptionRate - this.TOTAL_EXEMPTION_RATE) * this.QUALIFYING_PENSION_CEILING,
+                                // שיעור הפטור הכללי לפי המדרגות שהוגדרו
+                                exemption_rate: calculatedExemptionRate * 100,
+                                taxable_monthly_income: taxableIncome,
+                                marginal_tax_rate: marginalTaxRate,
+                                monthly_tax: monthlyTax,
+                                monthly_net_income: netIncome,
+                                waiver_for_no_tax: waiverCapital,
+                                remaining_exempt_capital: correctRemainingExemptCapital,
+                                capital_addition: year === 2024 ? 0 : (correctRemainingExemptCapital - resultsByYear[2024].remaining_exempt_capital)
+                            };
+                        }
+
+                        return {
+                            totalExemptCapital: qualifyingPensionCeiling * EXEMPTION_RATES[2024].total * this.MONTHS_FACTOR,
+                            severanceImpact: Math.min(exemptSeverance * this.SEVERANCE_IMPACT_FACTOR, this.MAX_SEVERANCE_IMPACT),
+                            calculations: resultsByYear
+                        };
+
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+            }
+
+            // Initialize calculator
+            const calculator = new RightsCalculator();
+
+            // Form submission handler
+            document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    birthDate: document.getElementById('birthDate').value,
+                    gender: document.querySelector('input[name="gender"]:checked').value,
+                    pensionStartDate: document.getElementById('pensionStartDate').value,
+                    exemptSeverance: parseFloat(document.getElementById('severanceAmount').value) || 0,
+                    capitalizationAmount: parseFloat(document.getElementById('capitalizationAmount').value) || 0,
+                    monthlyPension: parseFloat(document.getElementById('monthlyPension').value) || 0,
+                    additionalIncome: parseFloat(document.getElementById('additionalIncome').value) || 0,
+                    waiverAmount: parseFloat(document.getElementById('waiverAmount').value) || 0,
+                    capitalAmount: parseFloat(document.getElementById('capitalAmount').value) || 0
+                };
+
+                try {
+                    const result = calculator.calculateExemption(
+                        formData.birthDate,
+                        formData.gender,
+                        formData.pensionStartDate,
+                        formData.exemptSeverance,
+                        formData.capitalizationAmount,
+                        formData.monthlyPension,
+                        formData.additionalIncome,
+                        formData.waiverAmount,
+                        formData.capitalAmount
+                    );
+
+                    // Update results in the UI
+                    updateTableValues(result.calculations);
+                    
+                    // Show results section
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('error').style.display = 'none';
+                    
+                    // Scroll to results
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+
+                } catch (error) {
+                    document.getElementById('error').textContent = error.message;
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('results').style.display = 'none';
+                }
+            });
+
+            // Reset form functionality
+            document.getElementById('resetForm').addEventListener('click', () => {
+                document.getElementById('calculatorForm').reset();
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('error').textContent = '';
+            });
+
+            document.getElementById('sampleCalculation').addEventListener('click', () => {
+                // Set sample values
+                document.getElementById('birthDate').value = '1956-01-01';
+                document.getElementById('pensionStartDate').value = '2020-01-01';
+                document.querySelector('input[name="gender"][value="male"]').checked = true;
+                document.getElementById('severanceAmount').value = '113000';
+                document.getElementById('capitalizationAmount').value = '42000';
+                document.getElementById('monthlyPension').value = '7000';
+                document.getElementById('additionalIncome').value = '4000';
+                
+                // Trigger form submission
+                document.getElementById('calculatorForm').dispatchEvent(new Event('submit'));
+            });
+
+            // Event listeners for conversion calculations
+            document.getElementById('waiverAmount').addEventListener('input', function(e) {
+                const value = parseFloat(e.target.value) || 0;
+                const result = value * 180;
+                document.getElementById('waiver_result').textContent = `תמורת משיכה הונית: ${formatNumber(result)} ₪`;
+            });
+
+            document.getElementById('capitalAmount').addEventListener('input', function(e) {
+                const value = parseFloat(e.target.value) || 0;
+                const result = value / 180;
+                document.getElementById('capital_result').textContent = `תמורת ויתור פטור קצבה: ${formatNumber(result)} ₪`;
+            });
+
+            // Update table values
+            function updateTableValues(data) {
+                const years = [2024, 2025, 2026, 2027, 2028];
+                const fields = [
+                    'max_monthly_exemption',
+                    'actual_exemption_percentage',
+                    'actual_monthly_exemption',
+                    'exemption_addition',
+                    'exemption_rate',
+                    'taxable_monthly_income',
+                    'marginal_tax_rate',
+                    'monthly_tax',
+                    'monthly_net_income',
+                    'waiver_for_no_tax',
+                    'remaining_exempt_capital',
+                    'capital_addition'
+                ];
+
+                years.forEach(year => {
+                    const yearData = data[year];
+                    if (yearData) {
+                        fields.forEach(field => {
+                            const element = document.getElementById(`${field}_${year}`);
+                            if (element) {
+                                let value = yearData[field];
+                                if (value !== null && value !== undefined && !isNaN(value)) {
+                                    // Format numbers
+                                    if (field.includes('rate')) {
+                                        element.textContent = value.toFixed(1);
+                                    } else {
+                                        element.textContent = formatNumber(value);
+                                    }
+                                } else {
+                                    element.textContent = '0';
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            function formatNumber(number, decimals = 2) {
+                if (number === null || number === undefined || isNaN(number)) return '0';
+                return Number(number).toLocaleString('he-IL', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                });
+            }
+        </script>
+    </body>
+</html>
